@@ -7,9 +7,16 @@ import { fileURLToPath } from 'url'
 import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
 import { GetPlatformProxyOptions } from 'wrangler'
 import { r2Storage } from '@payloadcms/storage-r2'
+import { importExportPlugin } from '@payloadcms/plugin-import-export'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Organizations } from './collections/Organizations'
+import { Projects } from './collections/Projects'
+import { Parties } from './collections/Parties'
+import { Categories } from './collections/Categories'
+import { Transactions } from './collections/Transactions'
+import { Taxes } from './collections/Taxes'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -49,19 +56,42 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      views: {
+        bulkTransactions: {
+          Component: '/components/BulkAddTransactions',
+          path: '/bulk-transactions',
+          exact: true,
+        },
+        importTransactions: {
+          Component: '/components/ImportTransactions',
+          path: '/import-transactions',
+          exact: true,
+        },
+      },
+    },
   },
-  collections: [Users, Media],
+  collections: [Organizations, Users, Media, Projects, Parties, Categories, Transactions, Taxes],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
+  db: sqliteD1Adapter({ binding: cloudflare.env.D1, idType: 'uuid', push: false }),
   logger: isProduction ? cloudflareLogger : undefined,
   plugins: [
+    importExportPlugin({
+      collections: [
+        {
+          slug: 'transactions',
+          export: { disableJobsQueue: true },
+          import: { disableJobsQueue: true },
+        },
+      ],
+    }),
     r2Storage({
       bucket: cloudflare.env.R2,
-      collections: { media: true },
+      collections: { media: true, exports: true, imports: true },
     }),
   ],
 })
