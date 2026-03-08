@@ -21,8 +21,8 @@ export const Transactions: CollectionConfig = {
     delete: tenantDelete,
   },
   hooks: {
-    beforeChange: [populateOrganization],
     beforeValidate: [
+      populateOrganization,
       ({ data }) => {
         if (!data?.mainPartyFrom && !data?.mainPartyTo) {
           throw new ValidationError({
@@ -35,6 +35,21 @@ export const Transactions: CollectionConfig = {
           })
         }
         return data
+      },
+    ],
+    beforeDelete: [
+      async ({ id, req }) => {
+        const linkedPayments = await req.payload.find({
+          collection: 'invoice-payments',
+          where: { transaction: { equals: id } },
+          depth: 0,
+          limit: 1,
+        })
+        if (linkedPayments.totalDocs > 0) {
+          throw new Error(
+            'Cannot delete a transaction linked to invoices. Unlink the invoice payments first.',
+          )
+        }
       },
     ],
   },

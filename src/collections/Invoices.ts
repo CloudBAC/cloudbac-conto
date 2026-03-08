@@ -23,6 +23,21 @@ export const Invoices: CollectionConfig = {
       generateInvoiceNumber,
       computeInvoiceTotals,
     ],
+    beforeDelete: [
+      async ({ id, req }) => {
+        const linkedPayments = await req.payload.find({
+          collection: 'invoice-payments',
+          where: { invoice: { equals: id } },
+          depth: 0,
+          limit: 1,
+        })
+        if (linkedPayments.totalDocs > 0) {
+          throw new Error(
+            'Cannot delete an invoice with linked payments. Cancel the invoice instead.',
+          )
+        }
+      },
+    ],
   },
   fields: [
     {
