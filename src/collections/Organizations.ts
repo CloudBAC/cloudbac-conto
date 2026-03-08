@@ -39,7 +39,7 @@ export const Organizations: CollectionConfig = {
           )
         }
 
-        const collections = ['projects', 'parties', 'transactions', 'media'] as const
+        const collections = ['projects', 'parties', 'transactions', 'media', 'invoices', 'invoice-payments'] as const
         for (const collection of collections) {
           const result = await req.payload.find({
             collection,
@@ -67,6 +67,22 @@ export const Organizations: CollectionConfig = {
       type: 'relationship',
       relationTo: 'organizations',
       maxDepth: 1,
+    },
+    {
+      name: 'invoicePrefix',
+      type: 'text',
+      admin: {
+        description: 'Custom prefix for invoice numbers (e.g., "ABC")',
+      },
+    },
+    {
+      name: 'invoiceNextNumber',
+      type: 'number',
+      defaultValue: 1,
+      min: 1,
+      admin: {
+        description: 'Next sequential invoice number (auto-incremented)',
+      },
     },
   ],
 }

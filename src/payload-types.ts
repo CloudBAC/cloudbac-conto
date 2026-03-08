@@ -75,6 +75,8 @@ export interface Config {
     categories: Category;
     transactions: Transaction;
     taxes: Tax;
+    invoices: Invoice;
+    'invoice-payments': InvoicePayment;
     exports: Export;
     imports: Import;
     'payload-kv': PayloadKv;
@@ -93,6 +95,8 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     taxes: TaxesSelect<false> | TaxesSelect<true>;
+    invoices: InvoicesSelect<false> | InvoicesSelect<true>;
+    'invoice-payments': InvoicePaymentsSelect<false> | InvoicePaymentsSelect<true>;
     exports: ExportsSelect<false> | ExportsSelect<true>;
     imports: ImportsSelect<false> | ImportsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -147,6 +151,14 @@ export interface Organization {
   id: string;
   name: string;
   parent?: (string | null) | Organization;
+  /**
+   * Custom prefix for invoice numbers (e.g., "ABC")
+   */
+  invoicePrefix?: string | null;
+  /**
+   * Next sequential invoice number (auto-incremented)
+   */
+  invoiceNextNumber?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -309,6 +321,59 @@ export interface Tax {
   isDefault?: boolean | null;
   description?: string | null;
   organization: string | Organization;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices".
+ */
+export interface Invoice {
+  id: string;
+  invoiceNumber?: string | null;
+  type: 'sales';
+  status: 'draft' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
+  party: string | Party;
+  organization: string | Organization;
+  project?: (string | null) | Project;
+  issueDate: string;
+  dueDate: string;
+  paymentTerms?: ('immediate' | 'net_15' | 'net_30' | 'net_60' | 'custom') | null;
+  lineItems: {
+    description: string;
+    quantity: number;
+    rate: number;
+    amount?: number | null;
+    taxType?: (string | null) | Tax;
+    id?: string | null;
+  }[];
+  subtotal?: number | null;
+  taxes?:
+    | {
+        taxType: string | Tax;
+        taxAmount: number;
+        id?: string | null;
+      }[]
+    | null;
+  totalAmount?: number | null;
+  paidAmount?: number | null;
+  balanceDue?: number | null;
+  notes?: string | null;
+  createdBy?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoice-payments".
+ */
+export interface InvoicePayment {
+  id: string;
+  invoice: string | Invoice;
+  transaction: string | Transaction;
+  allocatedAmount: number;
+  organization: string | Organization;
+  createdBy?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -533,6 +598,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'taxes';
         value: string | Tax;
+      } | null)
+    | ({
+        relationTo: 'invoices';
+        value: string | Invoice;
+      } | null)
+    | ({
+        relationTo: 'invoice-payments';
+        value: string | InvoicePayment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -583,6 +656,8 @@ export interface PayloadMigration {
 export interface OrganizationsSelect<T extends boolean = true> {
   name?: T;
   parent?: T;
+  invoicePrefix?: T;
+  invoiceNextNumber?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -724,6 +799,59 @@ export interface TaxesSelect<T extends boolean = true> {
   isDefault?: T;
   description?: T;
   organization?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices_select".
+ */
+export interface InvoicesSelect<T extends boolean = true> {
+  invoiceNumber?: T;
+  type?: T;
+  status?: T;
+  party?: T;
+  organization?: T;
+  project?: T;
+  issueDate?: T;
+  dueDate?: T;
+  paymentTerms?: T;
+  lineItems?:
+    | T
+    | {
+        description?: T;
+        quantity?: T;
+        rate?: T;
+        amount?: T;
+        taxType?: T;
+        id?: T;
+      };
+  subtotal?: T;
+  taxes?:
+    | T
+    | {
+        taxType?: T;
+        taxAmount?: T;
+        id?: T;
+      };
+  totalAmount?: T;
+  paidAmount?: T;
+  balanceDue?: T;
+  notes?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoice-payments_select".
+ */
+export interface InvoicePaymentsSelect<T extends boolean = true> {
+  invoice?: T;
+  transaction?: T;
+  allocatedAmount?: T;
+  organization?: T;
+  createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }

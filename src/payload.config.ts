@@ -17,6 +17,8 @@ import { Parties } from './collections/Parties'
 import { Categories } from './collections/Categories'
 import { Transactions } from './collections/Transactions'
 import { Taxes } from './collections/Taxes'
+import { Invoices } from './collections/Invoices'
+import { InvoicePayments } from './collections/InvoicePayments'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -71,7 +73,7 @@ export default buildConfig({
       },
     },
   },
-  collections: [Organizations, Users, Media, Projects, Parties, Categories, Transactions, Taxes],
+  collections: [Organizations, Users, Media, Projects, Parties, Categories, Transactions, Taxes, Invoices, InvoicePayments],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
