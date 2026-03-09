@@ -9,6 +9,15 @@ export const Invoices: CollectionConfig = {
   slug: 'invoices',
   admin: {
     useAsTitle: 'invoiceNumber',
+    components: {
+      views: {
+        edit: {
+          default: {
+            Component: '/components/InvoiceEditor',
+          },
+        },
+      },
+    },
   },
   access: {
     create: tenantCreate,

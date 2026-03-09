@@ -2,6 +2,7 @@ import { ExportListMenuItem as ExportListMenuItem_cdf7e044479f899a31f804427d568b
 import { ImportListMenuItem as ImportListMenuItem_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { default as default_b5ba27e9544cb3d5537b762efe2cde6d } from '../../../components/BulkAddButton'
 import { default as default_6436b0d7a1c7fbbfce4fbfa7378b624d } from '../../../components/ImportExcelButton'
+import { default as default_9bb001d1fc7d954796e2e9c13e0ae4b2 } from '../../../components/InvoiceEditor'
 import { Page as Page_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { SortBy as SortBy_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { SortOrder as SortOrder_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
@@ -23,6 +24,7 @@ export const importMap = {
   "@payloadcms/plugin-import-export/rsc#ImportListMenuItem": ImportListMenuItem_cdf7e044479f899a31f804427d568b36,
   "/components/BulkAddButton#default": default_b5ba27e9544cb3d5537b762efe2cde6d,
   "/components/ImportExcelButton#default": default_6436b0d7a1c7fbbfce4fbfa7378b624d,
+  "/components/InvoiceEditor#default": default_9bb001d1fc7d954796e2e9c13e0ae4b2,
   "@payloadcms/plugin-import-export/rsc#Page": Page_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#SortBy": SortBy_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#SortOrder": SortOrder_cdf7e044479f899a31f804427d568b36,
