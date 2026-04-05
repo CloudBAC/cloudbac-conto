@@ -58,7 +58,14 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: ' — Conto',
+    },
     components: {
+      graphics: {
+        Logo: '/components/AdminLogo',
+        Icon: '/components/AdminIcon',
+      },
       views: {
         bulkTransactions: {
           Component: '/components/BulkAddTransactions',

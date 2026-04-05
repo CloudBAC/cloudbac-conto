@@ -1,7 +1,7 @@
 import type { DocumentViewServerProps } from 'payload'
 import InvoiceEditView from './InvoiceEditView'
 
-export default async function InvoiceEditor({ initPageResult }: DocumentViewServerProps) {
+export default async function InvoiceEditor({ doc, initPageResult }: DocumentViewServerProps) {
   const { req } = initPageResult
 
   const [partiesResult, projectsResult, taxesResult] = await Promise.all([
@@ -52,6 +52,7 @@ export default async function InvoiceEditor({ initPageResult }: DocumentViewServ
 
   return (
     <InvoiceEditView
+      invoiceData={doc ? JSON.parse(JSON.stringify(doc)) : null}
       partyOptions={partyOptions}
       projectOptions={projectOptions}
       taxOptions={taxOptions}

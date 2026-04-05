@@ -1,0 +1,463 @@
+/* ==============================================
+   CONTO — Payload Admin Whitelabel Theme
+   Aesthetic: Dark luxury, warm amber, editorial
+   Matches the landing page design system
+   ============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap');
+
+/* ── Color Palette ──────────────────────────── */
+:root {
+  /* Override the entire base color scale to charcoal tones */
+  --color-base-0: #f0ebe3;    /* cream — lightest */
+  --color-base-50: #e6e0d6;
+  --color-base-100: #d5cec3;
+  --color-base-150: #c0b9ae;
+  --color-base-200: #a8a29e;
+  --color-base-250: #918b85;
+  --color-base-300: #7b756e;
+  --color-base-350: #656058;
+  --color-base-400: #504b44;
+  --color-base-450: #3d3834;
+  --color-base-500: #2e2a27;
+  --color-base-550: #26231f;
+  --color-base-600: #1f1c19;
+  --color-base-650: #1a1816;
+  --color-base-700: #161413;
+  --color-base-750: #131110;
+  --color-base-800: #111113;
+  --color-base-850: #0e0e0f;
+  --color-base-900: #0c0c0d;
+  --color-base-950: #0a0a0b;
+  --color-base-1000: #070708;  /* deepest black */
+
+  /* Success — muted sage green */
+  --color-success-50: #f0f7f2;
+  --color-success-100: #d4ecd9;
+  --color-success-150: #b2ddb9;
+  --color-success-200: #8ecc99;
+  --color-success-250: #72bf7f;
+  --color-success-300: #5cb87a;
+  --color-success-350: #4da96a;
+  --color-success-400: #3f955b;
+  --color-success-450: #34804d;
+  --color-success-500: #2a6b40;
+  --color-success-550: #225836;
+  --color-success-600: #1a462b;
+  --color-success-650: #143822;
+  --color-success-700: #0f2b1a;
+  --color-success-750: #0b2014;
+  --color-success-800: #08170e;
+  --color-success-850: #050f09;
+  --color-success-900: #030a06;
+  --color-success-950: #020603;
+
+  /* Error — warm rose */
+  --color-error-50: #fdf2f2;
+  --color-error-100: #fad6d8;
+  --color-error-150: #f4b0b5;
+  --color-error-200: #ee8b92;
+  --color-error-250: #e87580;
+  --color-error-300: #e06c75;
+  --color-error-350: #d55c65;
+  --color-error-400: #c44d56;
+  --color-error-450: #af4049;
+  --color-error-500: #99363f;
+  --color-error-550: #7f2d34;
+  --color-error-600: #66242a;
+  --color-error-650: #501c22;
+  --color-error-700: #3c151a;
+  --color-error-750: #2c1014;
+  --color-error-800: #1f0b0e;
+  --color-error-850: #14080a;
+  --color-error-900: #0c0507;
+  --color-error-950: #070304;
+
+  /* Warning — amber/gold (the signature Conto accent) */
+  --color-warning-50: #fdf8ee;
+  --color-warning-100: #f8ead0;
+  --color-warning-150: #f0d9a8;
+  --color-warning-200: #e8c882;
+  --color-warning-250: #debb6a;
+  --color-warning-300: #d4a853;
+  --color-warning-350: #c99b45;
+  --color-warning-400: #b8923f;
+  --color-warning-450: #a38138;
+  --color-warning-500: #8c6f30;
+  --color-warning-550: #755d29;
+  --color-warning-600: #5e4b21;
+  --color-warning-650: #4a3b1a;
+  --color-warning-700: #372c14;
+  --color-warning-750: #28200f;
+  --color-warning-800: #1c160a;
+  --color-warning-850: #120e07;
+  --color-warning-900: #0a0804;
+  --color-warning-950: #060502;
+
+  /* Blue — muted steel blue */
+  --color-blue-50: #f0f3f8;
+  --color-blue-100: #d4dde9;
+  --color-blue-150: #b2c1d6;
+  --color-blue-200: #8ea5c3;
+  --color-blue-250: #7292b5;
+  --color-blue-300: #5c82a8;
+  --color-blue-350: #4d7399;
+  --color-blue-400: #3f6488;
+  --color-blue-450: #345575;
+  --color-blue-500: #2a4762;
+  --color-blue-550: #223a51;
+  --color-blue-600: #1a2e40;
+  --color-blue-650: #142433;
+  --color-blue-700: #0f1b27;
+  --color-blue-750: #0b141d;
+  --color-blue-800: #080e14;
+  --color-blue-850: #050a0e;
+  --color-blue-900: #030609;
+  --color-blue-950: #020405;
+
+  /* Typography */
+  --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'DM Mono', 'SF Mono', Menlo, monospace;
+}
+
+/* ── Dark Theme (default & forced) ──────────── */
+html[data-theme='dark'] {
+  --theme-bg: #0a0a0b;
+  --theme-text: #f0ebe3;
+  --theme-input-bg: #111113;
+  --theme-border-color: rgba(240, 235, 227, 0.1);
+
+  --theme-elevation-0: #0a0a0b;
+  --theme-elevation-50: #0c0c0d;
+  --theme-elevation-100: #0e0e0f;
+  --theme-elevation-150: rgba(240, 235, 227, 0.1);
+  --theme-elevation-200: #161418;
+  --theme-elevation-250: #1a1816;
+  --theme-elevation-300: #1f1c19;
+  --theme-elevation-350: #26231f;
+  --theme-elevation-400: #2e2a27;
+  --theme-elevation-450: #3d3834;
+  --theme-elevation-500: #504b44;
+  --theme-elevation-550: #656058;
+  --theme-elevation-600: #7b756e;
+  --theme-elevation-650: #918b85;
+  --theme-elevation-700: #a8a29e;
+  --theme-elevation-750: #c0b9ae;
+  --theme-elevation-800: #d5cec3;
+  --theme-elevation-850: #e6e0d6;
+  --theme-elevation-900: #f0ebe3;
+  --theme-elevation-950: #f5f0e8;
+  --theme-elevation-1000: #faf7f2;
+}
+
+/* ── Light Theme Override (keep dark feel) ──── */
+html[data-theme='light'] {
+  --theme-bg: #f5f0e8;
+  --theme-text: #0a0a0b;
+  --theme-input-bg: #faf7f2;
+  --theme-border-color: rgba(10, 10, 11, 0.1);
+
+  --theme-elevation-0: #faf7f2;
+  --theme-elevation-50: #f5f0e8;
+  --theme-elevation-100: #f0ebe3;
+  --theme-elevation-150: rgba(10, 10, 11, 0.1);
+  --theme-elevation-200: #e6e0d6;
+  --theme-elevation-250: #d5cec3;
+  --theme-elevation-300: #c0b9ae;
+  --theme-elevation-350: #a8a29e;
+  --theme-elevation-400: #918b85;
+  --theme-elevation-450: #7b756e;
+  --theme-elevation-500: #656058;
+  --theme-elevation-550: #504b44;
+  --theme-elevation-600: #3d3834;
+  --theme-elevation-650: #2e2a27;
+  --theme-elevation-700: #26231f;
+  --theme-elevation-750: #1f1c19;
+  --theme-elevation-800: #161413;
+  --theme-elevation-850: #111113;
+  --theme-elevation-900: #0c0c0d;
+  --theme-elevation-950: #0a0a0b;
+  --theme-elevation-1000: #070708;
+}
+
+/* ── Global Overrides ───────────────────────── */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Softer border radius — more refined */
+:root {
+  --style-radius-s: 6px;
+  --style-radius-m: 8px;
+  --style-radius-l: 12px;
+}
+
+/* ── Navigation Sidebar ─────────────────────── */
+.nav {
+  background: var(--theme-elevation-0) !important;
+  border-right: 1px solid var(--theme-border-color) !important;
+}
+
+/* Nav group labels — subtle uppercase */
+.nav-group__label {
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: var(--theme-elevation-500) !important;
+  font-weight: 500 !important;
+}
+
+/* Nav links — refined hover */
+.nav-group .nav-group__link {
+  border-radius: var(--style-radius-m) !important;
+  transition: background 0.15s, color 0.15s !important;
+}
+
+.nav-group .nav-group__link:hover,
+.nav-group .nav-group__link.active {
+  background: rgba(212, 168, 83, 0.08) !important;
+}
+
+.nav-group .nav-group__link.active {
+  color: #d4a853 !important;
+}
+
+/* ── App Header ─────────────────────────────── */
+.app-header {
+  background: var(--theme-elevation-0) !important;
+  border-bottom: 1px solid var(--theme-border-color) !important;
+  backdrop-filter: blur(16px);
+}
+
+/* ── Buttons ────────────────────────────────── */
+/* Primary button — amber accent */
+.btn {
+  border-radius: var(--style-radius-m) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.btn:where(:not(.btn--style-none)):where(:not(.btn--style-secondary)):where(:not(.btn--style-error)):where(:not(.btn--style-icon-label)):where(:not(.btn--style-pill)) {
+  --bg-color: #d4a853;
+  --hover-bg: #b8923f;
+  --color: #0a0a0b;
+  --hover-color: #0a0a0b;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Secondary/pill buttons */
+.btn--style-pill {
+  border-radius: 100px !important;
+}
+
+/* ── Cards & Panels ─────────────────────────── */
+.card {
+  border-radius: var(--style-radius-l) !important;
+  border-color: var(--theme-border-color) !important;
+  transition: border-color 0.2s, box-shadow 0.3s !important;
+}
+
+.card:hover {
+  border-color: rgba(212, 168, 83, 0.15) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ── Table Styling ──────────────────────────── */
+.table {
+  border-radius: var(--style-radius-l) !important;
+  overflow: hidden !important;
+}
+
+.table .row:hover .cell {
+  background: rgba(212, 168, 83, 0.04) !important;
+}
+
+.table .cell-link:hover {
+  color: #d4a853 !important;
+}
+
+/* Table header — subtle uppercase treatment */
+.table .sort-column__label {
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  font-weight: 500 !important;
+}
+
+/* ── Form Fields ────────────────────────────── */
+.field-type input,
+.field-type textarea,
+.field-type select {
+  border-radius: var(--style-radius-m) !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.field-type input:focus,
+.field-type textarea:focus,
+.field-type select:focus {
+  border-color: #d4a853 !important;
+  box-shadow: 0 0 0 2px rgba(212, 168, 83, 0.15) !important;
+}
+
+/* ── Pills / Tags ───────────────────────────── */
+.pill {
+  border-radius: 100px !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Status pills — match Conto colors */
+.pill--style-success,
+.pill--has-action.pill--style-success {
+  background: rgba(92, 184, 122, 0.12) !important;
+  color: #5cb87a !important;
+}
+
+.pill--style-warning,
+.pill--has-action.pill--style-warning {
+  background: rgba(212, 168, 83, 0.12) !important;
+  color: #d4a853 !important;
+}
+
+.pill--style-error,
+.pill--has-action.pill--style-error {
+  background: rgba(224, 108, 117, 0.12) !important;
+  color: #e06c75 !important;
+}
+
+/* ── Dashboard ──────────────────────────────── */
+.dashboard {
+  max-width: 1280px !important;
+}
+
+.dashboard__label {
+  font-family: var(--font-serif) !important;
+  font-size: 28px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Dashboard cards — refined hover */
+.dashboard-card {
+  border-radius: var(--style-radius-l) !important;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s, box-shadow 0.3s !important;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(212, 168, 83, 0.18) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ── Drawer / Modal ─────────────────────────── */
+.drawer__content {
+  border-radius: var(--style-radius-l) var(--style-radius-l) 0 0 !important;
+}
+
+/* ── Login Page ─────────────────────────────── */
+.login {
+  background: var(--theme-bg) !important;
+}
+
+.login__brand {
+  margin-bottom: 40px !important;
+}
+
+.login .form-submit .btn {
+  width: 100% !important;
+  justify-content: center !important;
+  padding: 14px 24px !important;
+  font-size: 15px !important;
+  border-radius: var(--style-radius-l) !important;
+}
+
+/* ── Scrollbar ──────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(240, 235, 227, 0.12);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(240, 235, 227, 0.2);
+}
+
+/* ── Selection Color ────────────────────────── */
+::selection {
+  background: rgba(212, 168, 83, 0.25);
+  color: #f0ebe3;
+}
+
+/* ── Focus Ring (Accessibility) ─────────────── */
+:root {
+  --accessibility-outline: 2px solid rgba(212, 168, 83, 0.5);
+  --accessibility-outline-offset: 2px;
+}
+
+/* ── Step Nav / Breadcrumbs ─────────────────── */
+.step-nav a {
+  transition: color 0.15s !important;
+}
+
+.step-nav a:hover {
+  color: #d4a853 !important;
+}
+
+/* ── Relationship field ─────────────────────── */
+.relationship--single-value__text,
+.react-select .rs__single-value {
+  font-weight: 400 !important;
+}
+
+/* ── Tabs ───────────────────────────────────── */
+.tabs-field__tab-button--active {
+  border-color: #d4a853 !important;
+  color: #d4a853 !important;
+}
+
+/* ── Collection List View ───────────────────── */
+.collection-list__header {
+  font-family: var(--font-serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* ── Edit View Document Header ──────────────── */
+.doc-header__title {
+  font-family: var(--font-body) !important;
+  font-weight: 500 !important;
+}
+
+/* ── Subtle Grain Overlay on Admin ──────────── */
+#app::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px;
+}
+
+/* ── Transition Smoothing ───────────────────── */
+* {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}

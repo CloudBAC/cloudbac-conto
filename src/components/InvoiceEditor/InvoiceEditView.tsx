@@ -1,12 +1,22 @@
 'use client'
 
-import { useMemo, useCallback } from 'react'
-import { useAllFormFields } from '@payloadcms/ui'
+import { useState, useMemo, useCallback } from 'react'
+import { toast } from '@payloadcms/ui'
+import { useRouter } from 'next/navigation.js'
 import styles from './InvoiceEditorForm.module.scss'
 
 type SelectOption = { label: string; value: string; rate?: number }
 
+type LineItem = {
+  id: string
+  description: string
+  quantity: string
+  rate: string
+  taxTypeId: string
+}
+
 type Props = {
+  invoiceData: any | null
   partyOptions: SelectOption[]
   projectOptions: SelectOption[]
   taxOptions: SelectOption[]
@@ -36,47 +46,102 @@ function formatINR(n: number): string {
   })
 }
 
+function createEmptyLine(): LineItem {
+  return {
+    id: crypto.randomUUID(),
+    description: '',
+    quantity: '1',
+    rate: '',
+    taxTypeId: '',
+  }
+}
+
+function resolveId(val: unknown): string {
+  if (!val) return ''
+  if (typeof val === 'string') return val
+  if (typeof val === 'object' && val !== null && 'id' in val) return (val as any).id
+  return ''
+}
+
 export default function InvoiceEditView({
+  invoiceData,
   partyOptions,
   projectOptions,
   taxOptions,
 }: Props) {
-  const [fields, dispatch] = useAllFormFields()
+  const router = useRouter()
+  const isEdit = !!invoiceData?.id
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Read values from Payload form state
-  const partyId = (fields?.party?.value as string) ?? ''
-  const projectId = (fields?.project?.value as string) ?? ''
-  const issueDate = (fields?.issueDate?.value as string)?.split('T')[0] ?? ''
-  const dueDate = (fields?.dueDate?.value as string)?.split('T')[0] ?? ''
-  const paymentTerms = (fields?.paymentTerms?.value as string) ?? 'net_30'
-  const notes = (fields?.notes?.value as string) ?? ''
-  const status = (fields?.status?.value as string) ?? 'draft'
-  const invoiceNumber = (fields?.invoiceNumber?.value as string) ?? ''
+  // Initialize local state from server-provided document data
+  const [partyId, setPartyId] = useState(() => resolveId(invoiceData?.party))
+  const [projectId, setProjectId] = useState(() => resolveId(invoiceData?.project))
+  const [issueDate, setIssueDate] = useState(
+    () => invoiceData?.issueDate?.split('T')[0] ?? new Date().toISOString().split('T')[0],
+  )
+  const [dueDate, setDueDate] = useState(() => {
+    if (invoiceData?.dueDate) return invoiceData.dueDate.split('T')[0]
+    const d = new Date()
+    d.setDate(d.getDate() + 30)
+    return d.toISOString().split('T')[0]
+  })
+  const [paymentTerms, setPaymentTerms] = useState(invoiceData?.paymentTerms ?? 'net_30')
+  const [notes, setNotes] = useState(invoiceData?.notes ?? '')
+  const [lineItems, setLineItems] = useState<LineItem[]>(() => {
+    if (invoiceData?.lineItems?.length) {
+      return invoiceData.lineItems.map((li: any) => ({
+        id: li.id ?? crypto.randomUUID(),
+        description: li.description ?? '',
+        quantity: li.quantity?.toString() ?? '1',
+        rate: li.rate?.toString() ?? '',
+        taxTypeId: resolveId(li.taxType),
+      }))
+    }
+    return [createEmptyLine()]
+  })
 
-  const rows = fields?.lineItems?.rows ?? []
+  const organizationId = resolveId(invoiceData?.organization)
+  const status = invoiceData?.status ?? 'draft'
+  const invoiceNumber = invoiceData?.invoiceNumber ?? ''
 
-  // Dispatch a single field update
-  const updateField = useCallback(
-    (path: string, value: unknown) => {
-      dispatch({ type: 'UPDATE', path, value })
+  const handleLineChange = useCallback(
+    (index: number, field: keyof LineItem, value: string) => {
+      setLineItems((prev) => {
+        const next = [...prev]
+        next[index] = { ...next[index], [field]: value }
+        return next
+      })
     },
-    [dispatch],
+    [],
   )
 
-  // Build computed line items from form state
-  const computedLines = useMemo(() => {
-    return rows.map((_row, idx) => {
-      const description = (fields?.[`lineItems.${idx}.description`]?.value as string) ?? ''
-      const quantity = Number(fields?.[`lineItems.${idx}.quantity`]?.value) || 0
-      const rate = Number(fields?.[`lineItems.${idx}.rate`]?.value) || 0
-      const taxTypeId = (fields?.[`lineItems.${idx}.taxType`]?.value as string) ?? ''
-      const amount = quantity * rate
-      const taxOpt = taxOptions.find((t) => t.value === taxTypeId)
-      const taxRate = taxOpt?.rate ?? 0
-      const taxAmount = amount * (taxRate / 100)
-      return { idx, description, quantity, rate, taxTypeId, amount, taxRate, taxAmount }
+  const addLine = useCallback(() => {
+    setLineItems((prev) => [...prev, createEmptyLine()])
+  }, [])
+
+  const removeLine = useCallback((index: number) => {
+    setLineItems((prev) => {
+      if (prev.length <= 1) return prev
+      const next = [...prev]
+      next.splice(index, 1)
+      return next
     })
-  }, [rows, fields, taxOptions])
+  }, [])
+
+  // Computed values
+  const computedLines = useMemo(
+    () =>
+      lineItems.map((li) => {
+        const qty = Number(li.quantity) || 0
+        const rate = Number(li.rate) || 0
+        const amount = qty * rate
+        const taxOpt = taxOptions.find((t) => t.value === li.taxTypeId)
+        const taxRate = taxOpt?.rate ?? 0
+        const taxAmount = amount * (taxRate / 100)
+        return { ...li, amount, taxRate, taxAmount }
+      }),
+    [lineItems, taxOptions],
+  )
 
   const subtotal = useMemo(() => computedLines.reduce((s, l) => s + l.amount, 0), [computedLines])
   const totalTax = useMemo(
@@ -85,18 +150,64 @@ export default function InvoiceEditView({
   )
   const totalAmount = subtotal + totalTax
 
-  const handleAddRow = useCallback(() => {
-    dispatch({ type: 'ADD_ROW', path: 'lineItems', schemaPath: 'lineItems' })
-  }, [dispatch])
-
-  const handleRemoveRow = useCallback(
-    (rowIndex: number) => {
-      dispatch({ type: 'REMOVE_ROW', path: 'lineItems', rowIndex })
-    },
-    [dispatch],
-  )
-
   const statusInfo = status ? STATUS_MAP[status] : null
+
+  const handleSubmit = useCallback(async () => {
+    if (!partyId) {
+      toast.error('Please select a customer.')
+      return
+    }
+    if (lineItems.some((li) => !li.description || !li.rate)) {
+      toast.error('Please fill in all line item details.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    const body: Record<string, unknown> = {
+      party: partyId,
+      issueDate,
+      dueDate,
+      paymentTerms,
+      notes: notes || undefined,
+      lineItems: lineItems.map((li) => ({
+        description: li.description,
+        quantity: Number(li.quantity),
+        rate: Number(li.rate),
+        ...(li.taxTypeId ? { taxType: li.taxTypeId } : {}),
+      })),
+    }
+    if (organizationId) body.organization = organizationId
+    if (projectId) body.project = projectId
+
+    try {
+      const url = isEdit ? `/api/invoices/${invoiceData.id}` : '/api/invoices'
+      const method = isEdit ? 'PATCH' : 'POST'
+
+      const res = await fetch(url, {
+        method,
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+
+      if (!res.ok) {
+        const errBody = await res.json().catch((): null => null)
+        const msg =
+          errBody?.errors?.map((e: any) => e.message).join(', ') ||
+          `HTTP ${res.status}`
+        throw new Error(msg)
+      }
+
+      toast.success(isEdit ? 'Invoice updated.' : 'Invoice created.')
+      router.push('/admin/collections/invoices')
+      router.refresh()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save invoice.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [partyId, projectId, issueDate, dueDate, paymentTerms, notes, lineItems, isEdit, invoiceData, router])
 
   return (
     <div className={styles.page}>
@@ -104,7 +215,7 @@ export default function InvoiceEditView({
       <div className={styles.pageHeader}>
         <div className={styles.headerLeft}>
           <h1 className={styles.pageTitle}>
-            {invoiceNumber ? 'Edit Invoice' : 'New Invoice'}
+            {isEdit ? 'Edit Invoice' : 'New Invoice'}
           </h1>
           {invoiceNumber && (
             <span className={styles.invoiceNumber}>{invoiceNumber}</span>
@@ -125,7 +236,7 @@ export default function InvoiceEditView({
             <select
               className={styles.selectField}
               value={partyId}
-              onChange={(e) => updateField('party', e.target.value)}
+              onChange={(e) => setPartyId(e.target.value)}
             >
               <option value="">Select customer...</option>
               {partyOptions.map((p) => (
@@ -140,7 +251,7 @@ export default function InvoiceEditView({
             <select
               className={styles.selectField}
               value={projectId}
-              onChange={(e) => updateField('project', e.target.value || null)}
+              onChange={(e) => setProjectId(e.target.value)}
             >
               <option value="">None</option>
               {projectOptions.map((p) => (
@@ -162,7 +273,7 @@ export default function InvoiceEditView({
               type="date"
               className={styles.inputField}
               value={issueDate}
-              onChange={(e) => updateField('issueDate', e.target.value)}
+              onChange={(e) => setIssueDate(e.target.value)}
             />
           </div>
           <div className={styles.fieldGroup}>
@@ -173,7 +284,7 @@ export default function InvoiceEditView({
                   key={pt.value}
                   type="button"
                   className={`${styles.termChip} ${paymentTerms === pt.value ? styles.termChipActive : ''}`}
-                  onClick={() => updateField('paymentTerms', pt.value)}
+                  onClick={() => setPaymentTerms(pt.value)}
                 >
                   {pt.label}
                 </button>
@@ -186,7 +297,7 @@ export default function InvoiceEditView({
               type="date"
               className={styles.inputField}
               value={dueDate}
-              onChange={(e) => updateField('dueDate', e.target.value)}
+              onChange={(e) => setDueDate(e.target.value)}
             />
           </div>
         </div>
@@ -210,17 +321,15 @@ export default function InvoiceEditView({
             </tr>
           </thead>
           <tbody>
-            {computedLines.map((line) => (
-              <tr key={rows[line.idx]?.id ?? line.idx} className={styles.itemRow}>
+            {computedLines.map((line, idx) => (
+              <tr key={line.id} className={styles.itemRow}>
                 <td className={styles.tdDescription}>
                   <input
                     type="text"
                     className={styles.cellInput}
                     placeholder="Item description"
                     value={line.description}
-                    onChange={(e) =>
-                      updateField(`lineItems.${line.idx}.description`, e.target.value)
-                    }
+                    onChange={(e) => handleLineChange(idx, 'description', e.target.value)}
                   />
                 </td>
                 <td className={styles.tdNumber}>
@@ -228,10 +337,8 @@ export default function InvoiceEditView({
                     type="number"
                     className={`${styles.cellInput} ${styles.cellInputCenter}`}
                     placeholder="1"
-                    value={line.quantity || ''}
-                    onChange={(e) =>
-                      updateField(`lineItems.${line.idx}.quantity`, Number(e.target.value) || 0)
-                    }
+                    value={line.quantity}
+                    onChange={(e) => handleLineChange(idx, 'quantity', e.target.value)}
                     min="0.01"
                     step="any"
                   />
@@ -241,10 +348,8 @@ export default function InvoiceEditView({
                     type="number"
                     className={`${styles.cellInput} ${styles.cellInputRight}`}
                     placeholder="0.00"
-                    value={line.rate || ''}
-                    onChange={(e) =>
-                      updateField(`lineItems.${line.idx}.rate`, Number(e.target.value) || 0)
-                    }
+                    value={line.rate}
+                    onChange={(e) => handleLineChange(idx, 'rate', e.target.value)}
                     min="0"
                     step="any"
                   />
@@ -253,9 +358,7 @@ export default function InvoiceEditView({
                   <select
                     className={styles.cellSelect}
                     value={line.taxTypeId}
-                    onChange={(e) =>
-                      updateField(`lineItems.${line.idx}.taxType`, e.target.value || null)
-                    }
+                    onChange={(e) => handleLineChange(idx, 'taxTypeId', e.target.value)}
                   >
                     <option value="">No Tax</option>
                     {taxOptions.map((t) => (
@@ -269,11 +372,11 @@ export default function InvoiceEditView({
                   <span className={styles.amountValue}>{formatINR(line.amount)}</span>
                 </td>
                 <td className={styles.tdAction}>
-                  {rows.length > 1 && (
+                  {lineItems.length > 1 && (
                     <button
                       type="button"
                       className={styles.removeBtn}
-                      onClick={() => handleRemoveRow(line.idx)}
+                      onClick={() => removeLine(idx)}
                       title="Remove row"
                     >
                       &times;
@@ -286,7 +389,7 @@ export default function InvoiceEditView({
         </table>
 
         <div className={styles.addRowArea}>
-          <button type="button" className={styles.addRowBtn} onClick={handleAddRow}>
+          <button type="button" className={styles.addRowBtn} onClick={addLine}>
             + Add New Row
           </button>
         </div>
@@ -319,9 +422,28 @@ export default function InvoiceEditView({
           className={styles.notesArea}
           placeholder="Additional notes for the customer..."
           value={notes}
-          onChange={(e) => updateField('notes', e.target.value)}
+          onChange={(e) => setNotes(e.target.value)}
           rows={3}
         />
+      </div>
+
+      {/* ─── ACTIONS ─── */}
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.cancelBtn}
+          onClick={() => router.push('/admin/collections/invoices')}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className={styles.saveBtn}
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Saving...' : isEdit ? 'Update Invoice' : 'Save Invoice'}
+        </button>
       </div>
     </div>
   )

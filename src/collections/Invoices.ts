@@ -85,9 +85,12 @@ export const Invoices: CollectionConfig = {
       type: 'relationship',
       relationTo: 'parties',
       required: true,
-      filterOptions: ({ data }) => ({
-        organization: { equals: data?.organization },
-      }),
+      filterOptions: ({ data }) => {
+        const org = data?.organization
+        const orgId = typeof org === 'object' && org !== null ? (org as any).id : org
+        if (!orgId) return true
+        return { organization: { equals: orgId } }
+      },
     },
     {
       name: 'organization',
@@ -102,9 +105,12 @@ export const Invoices: CollectionConfig = {
       name: 'project',
       type: 'relationship',
       relationTo: 'projects',
-      filterOptions: ({ data }) => ({
-        organization: { equals: data?.organization },
-      }),
+      filterOptions: ({ data }) => {
+        const org = data?.organization
+        const orgId = typeof org === 'object' && org !== null ? (org as any).id : org
+        if (!orgId) return true
+        return { organization: { equals: orgId } }
+      },
     },
     {
       name: 'issueDate',
@@ -161,9 +167,12 @@ export const Invoices: CollectionConfig = {
           name: 'taxType',
           type: 'relationship',
           relationTo: 'taxes',
-          filterOptions: ({ data }) => ({
-            organization: { equals: data?.organization },
-          }),
+          filterOptions: ({ data }) => {
+            const org = data?.organization
+            const orgId = typeof org === 'object' && org !== null ? (org as any).id : org
+            if (!orgId) return true
+            return { organization: { equals: orgId } }
+          },
         },
       ],
     },
